@@ -9,11 +9,11 @@ const CONFIG = {
     pastaPortifolio: "portifolio"       // Nome da pasta onde ficam as fotos numeradas
 };
 
-// Fotos em destaque (ajustadas para a pasta portifolio ou imagens conforme sua estrutura)
+// Fotos em destaque (ajustadas para a pasta imagens ou imagens conforme sua estrutura)
 const minhasTatuagens = [
-    { arquivo: "estilo1.jpeg", descricao: "Lobo", estilo: "Realismo", pasta: "portifolio" },
-    { arquivo: "estilo2.jpeg", descricao: "Floral", estilo: "Fine Line", pasta: "portifolio" },
-    { arquivo: "estilo3.jpeg", descricao: "Geométrico", estilo: "Blackwork", pasta: "portifolio" }
+    { arquivo: "estilo1.jpeg", descricao: "Lobo", estilo: "Realismo", pasta: "imagens" },
+    { arquivo: "estilo2.jpeg", descricao: "Floral", estilo: "Fine Line", pasta: "imagens" },
+    { arquivo: "estilo3.jpeg", descricao: "Geométrico", estilo: "Blackwork", pasta: "imagens" }
 ];
 
 /* =========================================================
