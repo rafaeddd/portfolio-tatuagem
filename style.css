@@ -354,6 +354,47 @@ h1, h2, h3, .logo { display: block; flex-shrink: 0; }
 .rodape__linha { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 .rodape a { text-underline-offset: 4px; }
 
+
+/* ---------- WhatsApp flutuante: ícone circular ---------- */
+.whatsapp-flutuante {
+    position: fixed;
+    left: 15px;
+    bottom: 18px;
+    z-index: 60;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 2px solid rgba(255, 255, 255, .22);
+    border-radius: 50%;
+    background: #00c853;
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .42);
+    text-decoration: none;
+    transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.whatsapp-flutuante:hover {
+    background: #00b84a;
+    color: #fff;
+    transform: scale(1.07);
+    box-shadow: 0 5px 16px rgba(0, 0, 0, .48);
+}
+
+.whatsapp-flutuante svg {
+    display: block;
+    width: 29px;
+    height: 29px;
+    fill: currentColor;
+}
+
+.whatsapp-flutuante:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 4px;
+}
+
 /* ---------- Lightbox ---------- */
 .lightbox {
     position: fixed;
@@ -407,6 +448,21 @@ h1, h2, h3, .logo { display: block; flex-shrink: 0; }
     .sobre, .contato { grid-template-columns: 1fr; gap: 34px; }
     .sobre__foto { max-width: 380px; }
     .secao { padding: 64px 0; }
+}
+
+
+@media (max-width: 600px) {
+    .whatsapp-flutuante {
+        left: 14px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        width: 48px;
+        height: 48px;
+    }
+
+    .whatsapp-flutuante svg {
+        width: 28px;
+        height: 28px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

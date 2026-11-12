@@ -25,6 +25,14 @@ document.getElementById("link-insta").href = `https://instagram.com/${CONFIG.ins
 document.getElementById("link-whats").href =
     `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Olá! Vi seu portfólio e gostaria de um orçamento.")}`;
 
+
+// ---------- Botão flutuante do WhatsApp ----------
+const whatsappFlutuante = document.getElementById("whatsapp-flutuante");
+if (whatsappFlutuante) {
+    whatsappFlutuante.href =
+        `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Olá! Vi seu portfólio e gostaria de um orçamento.")}`;
+}
+
 // ---------- Galeria + filtros ----------
 const galeriaDiv = document.getElementById("galeria");
 const filtrosDiv = document.getElementById("filtros");
