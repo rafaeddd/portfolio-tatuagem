@@ -9,7 +9,7 @@
     --texto: #eaeaea;
     --texto-suave: #a8a8a8;
     --borda: #2c2c2c;
-    --altura-topo: 76px;
+    --altura-topo: 96px;
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,11 +27,8 @@ body {
 img { max-width: 100%; display: block; }
 a { color: inherit; }
 
-h1, h2, h3, .logo {
-    font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-    font-weight: 700;
-    line-height: 1.1;
-}
+h1, h2, h3, .logo { display: block; flex-shrink: 0; }
+.logo img { width: 200px; height: auto; }
 
 :focus-visible { outline: 3px solid var(--laranja-claro); outline-offset: 3px; }
 
@@ -61,9 +58,14 @@ h1, h2, h3, .logo {
     inset: 0 0 auto 0;
     z-index: 50;
     height: var(--altura-topo);
-    background: rgba(13, 13, 13, .92);
+    background: linear-gradient(rgba(0,0,0,.65), transparent);
+    border-bottom: 3px solid transparent;
+    transition: background-color .3s, border-color .3s, height .3s;
+}
+.topo.rolou {
+    background: rgba(13, 13, 13, .94);
     backdrop-filter: blur(8px);
-    border-bottom: 3px solid var(--vinho);
+    border-bottom-color: var(--vinho);
 }
 .topo__barra {
     height: 100%;
@@ -117,9 +119,9 @@ h1, h2, h3, .logo {
 /* ---------- Hero ---------- */
 .hero {
     position: relative;
-    height: min(88vh, 720px);
-    min-height: 480px;
-    margin-top: var(--altura-topo);
+    height: 100vh;
+    height: 100svh;
+    min-height: 560px;
     overflow: hidden;
     background: var(--vinho-escuro);
 }
@@ -128,15 +130,35 @@ h1, h2, h3, .logo {
     inset: 0;
     display: flex;
     align-items: center;
+    padding-top: var(--altura-topo);
     opacity: 0;
     visibility: hidden;
-    transition: opacity .9s ease, visibility .9s;
-    background:
-        linear-gradient(90deg, rgba(13,13,13,.9) 0%, rgba(13,13,13,.55) 55%, rgba(130,0,0,.35) 100%),
-        var(--img) center / cover no-repeat,
-        linear-gradient(135deg, var(--vinho-escuro), var(--fundo));
+    transition: opacity 1.2s ease, visibility 1.2s;
+    background: linear-gradient(135deg, var(--vinho-escuro), var(--fundo));
 }
 .slide.ativo { opacity: 1; visibility: visible; }
+
+/* Imagem de fundo com zoom lento */
+.slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--img) center / cover no-repeat;
+    transform: scale(1);
+}
+.slide.ativo::before { animation: zoom-lento 12s ease-out forwards; }
+@keyframes zoom-lento { to { transform: scale(1.15); } }
+
+/* Película escura + toque vinho para dar leitura ao texto */
+.slide::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.5) 55%, rgba(130,0,0,.35) 100%),
+        linear-gradient(0deg, rgba(0,0,0,.7) 0%, transparent 35%);
+}
+.slide > * { position: relative; z-index: 1; }
 
 .slide__texto { max-width: 1140px; }
 .slide__texto h1,
@@ -360,6 +382,8 @@ h1, h2, h3, .logo {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 860px) {
+    :root { --altura-topo: 80px; }
+    .logo img { width: 150px; }
     .menu-btn { display: flex; }
 
     .menu {
@@ -387,5 +411,6 @@ h1, h2, h3, .logo {
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
+    .slide.ativo::before { animation: none; }
     *, *::before, *::after { transition-duration: .01ms !important; }
 }

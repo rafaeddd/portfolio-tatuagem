@@ -20,7 +20,6 @@ const minhasTatuagens = [
    ========================================================= */
 
 // ---------- Dados básicos nos lugares certos ----------
-document.getElementById("logo-nome").textContent = CONFIG.nome;
 document.getElementById("endereco").textContent = CONFIG.endereco;
 document.getElementById("link-insta").href = `https://instagram.com/${CONFIG.instagram}`;
 document.getElementById("link-whats").href =
@@ -157,3 +156,9 @@ document.getElementById("form-contato").addEventListener("submit", e => {
         `Ideia: ${d.get("mensagem")}`;
     window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
 });
+
+// ---------- Topo transparente sobre a imagem; fica sólido ao rolar ----------
+const topo = document.getElementById("topo");
+function atualizarTopo() { topo.classList.toggle("rolou", window.scrollY > 40); }
+window.addEventListener("scroll", atualizarTopo, { passive: true });
+atualizarTopo();
