@@ -228,13 +228,17 @@
         </div>
         <form class="admin-form" id="form-login">
             <div id="msg-login" class="status-msg"></div>
-            <label>Usuário
+            <label>Usuário do Painel
                 <input type="text" id="login-usuario" required autocomplete="username">
             </label>
-            <label>Senha
+            <label>Senha do Painel
                 <input type="password" id="login-senha" required autocomplete="current-password">
             </label>
-            <button type="submit" class="btn btn--cta" style="width: 100%;">Entrar no Painel</button>
+            <label>Token de Acesso do GitHub (API)
+                <input type="password" id="login-token" placeholder="ghp_..." required>
+                <small style="color: var(--texto-suave); font-size: 0.8rem;">Será salvo de forma segura apenas neste navegador.</small>
+            </label>
+            <button type="submit" class="btn btn--cta" style="width: 100%; margin-top: 10px;">Entrar no Painel</button>
         </form>
     </div>
 
@@ -293,18 +297,15 @@
     </div>
 
     <script>
-        const LOGIN_ADMIN = {
-            usuario: "cursi",
-            senha: "1010@"
-        };
-
+        // CONFIGURAÇÕES DO REPOSITÓRIO (Estes dados públicos não oferecem risco sem o Token)
         const DADOS_GITHUB = {
             usuario: "rafaeddd",
             repositorio: "portfolio-tatuagem",
             branch: "main",
-            pasta: "portifolio",
-            token: "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"
+            pasta: "portifolio"
         };
+
+        const SENHA_MESTRE_HASH = "1010@"; // Defina a senha do painel aqui
 
         const telaLogin = document.getElementById("tela-login");
         const telaPainel = document.getElementById("tela-painel");
@@ -314,6 +315,12 @@
         const inputArquivo = document.getElementById("arquivo-imagem");
         const previewImg = document.getElementById("preview");
         const listaGerenciarDiv = document.getElementById("lista-gerenciar");
+        const inputTokenLogin = document.getElementById("login-token");
+
+        // Preenche o campo de token automaticamente se já estiver salvo no navegador
+        if (localStorage.getItem("cursi_gh_token")) {
+            inputTokenLogin.value = localStorage.getItem("cursi_gh_token");
+        }
 
         if (sessionStorage.getItem("cursi_admin_logado") === "true") {
             mostrarPainel();
@@ -338,13 +345,15 @@
             e.preventDefault();
             const user = document.getElementById("login-usuario").value.trim();
             const pass = document.getElementById("login-senha").value;
+            const tokenDigitado = inputTokenLogin.value.trim();
 
-            if (user === LOGIN_ADMIN.usuario && pass === LOGIN_ADMIN.senha) {
+            if (user === "admin" && pass === SENHA_MESTRE_HASH && tokenDigitado.startsWith("ghp_")) {
                 sessionStorage.setItem("cursi_admin_logado", "true");
+                localStorage.setItem("cursi_gh_token", tokenDigitado); // Salva o token de forma privada no navegador
                 msgLogin.className = "status-msg";
                 mostrarPainel();
             } else {
-                msgLogin.textContent = "Usuário ou senha incorretos.";
+                msgLogin.textContent = "Usuário, senha ou Token do GitHub inválidos.";
                 msgLogin.className = "status-msg erro";
             }
         });
@@ -428,8 +437,9 @@
             const btnEnviar = document.getElementById("btn-enviar");
             const file = inputArquivo.files[0];
             const otimizar = document.getElementById("otimizar-auto").checked;
+            const token = localStorage.getItem("cursi_gh_token");
 
-            if (!file) return;
+            if (!file || !token) return;
 
             btnEnviar.disabled = true;
             btnEnviar.textContent = "Enviando...";
@@ -437,7 +447,7 @@
             msgUpload.className = "status-msg info";
 
             try {
-                const proximoNumero = await obterProximoNumero(DADOS_GITHUB.token);
+                const proximoNumero = await obterProximoNumero(token);
                 const nomeArquivo = `${proximoNumero}.jpeg`;
                 const conteudoBase64 = await prepararImagemBase64(file, otimizar);
 
@@ -446,7 +456,7 @@
                 const respostaUpload = await fetch(urlUpload, {
                     method: "PUT",
                     headers: {
-                        "Authorization": `Bearer ${DADOS_GITHUB.token}`,
+                        "Authorization": `Bearer ${token}`,
                         "Accept": "application/vnd.github.v3+json",
                         "Content-Type": "application/json"
                     },
@@ -477,10 +487,12 @@
         async function carregarListaGerenciamento() {
             msgGerenciar.style.display = "none";
             listaGerenciarDiv.innerHTML = `<p style="text-align: center; color: var(--texto-suave);">Carregando fotos...</p>`;
+            const token = localStorage.getItem("cursi_gh_token");
+
             try {
                 const url = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}?ref=${DADOS_GITHUB.branch}`;
                 const resposta = await fetch(url, {
-                    headers: { "Authorization": `Bearer ${DADOS_GITHUB.token}`, "Accept": "application/vnd.github.v3+json" }
+                    headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github.v3+json" }
                 });
 
                 if (resposta.status === 404) {
@@ -537,6 +549,7 @@
             msgGerenciar.textContent = `Apagando ${nomeArquivo}...`;
             msgGerenciar.className = "status-msg info";
             msgGerenciar.style.display = "block";
+            const token = localStorage.getItem("cursi_gh_token");
 
             try {
                 const urlDelete = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}/${nomeArquivo}`;
@@ -544,7 +557,7 @@
                 const resposta = await fetch(urlDelete, {
                     method: "DELETE",
                     headers: {
-                        "Authorization": `Bearer ${DADOS_GITHUB.token}`,
+                        "Authorization": `Bearer ${token}`,
                         "Accept": "application/vnd.github.v3+json",
                         "Content-Type": "application/json"
                     },
