@@ -6,15 +6,14 @@ const CONFIG = {
     whatsapp: "5567992175023",          // DDI + DDD + número, só números
     instagram: "cursi_gaby_tattoo",     // sem o @
     endereco: "Endereço: R. DA 2, 1660 - Deoclécio Artuzzi, Dourados - MS, 79839-408",
-    pastaPortifolio: "portifolio",      // Nome da pasta onde você vai jogar as fotos numeradas
-    totalFotosAutomaticas: 60           // Procura automaticamente de 1.jpg até 60.jpg
+    pastaPortifolio: "portifolio"       // Nome da pasta onde ficam as fotos numeradas
 };
 
-// Fotos em destaque da pasta "imagens/" (opcional, caso queira filtrar por estilo)
+// Fotos em destaque (ajustadas para a pasta portifolio ou imagens conforme sua estrutura)
 const minhasTatuagens = [
-    { arquivo: "estilo1.jpg", descricao: "Lobo", estilo: "Realismo", pasta: "imagens" },
-    { arquivo: "estilo2.jpg", descricao: "Floral", estilo: "Fine Line", pasta: "imagens" },
-    { arquivo: "estilo3.jpg", descricao: "Geométrico", estilo: "Blackwork", pasta: "imagens" }
+    { arquivo: "estilo1.jpg", descricao: "Lobo", estilo: "Realismo", pasta: "portifolio" },
+    { arquivo: "estilo2.jpg", descricao: "Floral", estilo: "Fine Line", pasta: "portifolio" },
+    { arquivo: "estilo3.jpg", descricao: "Geométrico", estilo: "Blackwork", pasta: "portifolio" }
 ];
 
 /* =========================================================
@@ -77,13 +76,13 @@ function criarCardFoto(tatoo) {
     galeriaDiv.appendChild(card);
 }
 
-// Verifica se o arquivo de imagem realmente existe antes de adicionar na fila
-function verificarImagem(tatoo) {
+// Função para testar se uma imagem específica existe de forma segura
+function checarArquivo(url) {
     return new Promise(resolve => {
         const img = new Image();
-        img.onload = () => resolve(tatoo);
-        img.onerror = () => resolve(null);
-        img.src = `${tatoo.pasta || "imagens"}/${tatoo.arquivo}`;
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
     });
 }
 
@@ -103,26 +102,38 @@ async function desenharGaleria(estilo) {
     quantidadeExibida = 0;
     if (containerVerMais) containerVerMais.hidden = true;
 
-    // 1. Fotos cadastradas manualmente
-    const candidatas = estilo === "Todos"
+    let candidatas = estilo === "Todos"
         ? [...minhasTatuagens]
         : minhasTatuagens.filter(t => t.estilo === estilo);
 
-    // 2. Quando estiver na aba "Todos", inclui as fotos numeradas da pasta "portifolio/"
+    // Se estiver na aba "Todos", busca sequencialmente a partir do 1.jpeg
+    // Assim que achar um número que não existe, ele para o loop na mesma hora (sem gerar erros no console)
     if (estilo === "Todos") {
-        for (let i = 1; i <= CONFIG.totalFotosAutomaticas; i++) {
-            candidatas.push({
-                arquivo: `${i}.jpeg`,
-                descricao: `Trabalho #${i}`,
-                estilo: "Cursi Tattoo",
-                pasta: CONFIG.pastaPortifolio
-            });
+        let i = 1;
+        let sequenciaAtiva = true;
+
+        while (sequenciaAtiva && i <= 100) {
+            const arquivoNome = `${i}.jpeg`;
+            const caminhoCompleto = `${CONFIG.pastaPortifolio}/${arquivoNome}`;
+            
+            const existe = await checarArquivo(caminhoCompleto);
+            
+            if (existe) {
+                candidatas.push({
+                    arquivo: arquivoNome,
+                    descricao: `Trabalho #${i}`,
+                    estilo: "Cursi Tattoo",
+                    pasta: CONFIG.pastaPortifolio
+                });
+                i++;
+            } else {
+                // Se a imagem i não existe, para a varredura automática
+                sequenciaAtiva = false;
+            }
         }
     }
 
-    // Filtra apenas as imagens que existem de fato na pasta
-    const resultados = await Promise.all(candidatas.map(verificarImagem));
-    listaAtual = resultados.filter(Boolean);
+    listaAtual = candidatas;
 
     if (listaAtual.length === 0) {
         galeriaDiv.innerHTML = `<p class="galeria__vazia">Nenhum trabalho encontrado nessa categoria.</p>`;
