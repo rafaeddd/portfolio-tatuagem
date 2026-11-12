@@ -244,6 +244,13 @@ h1, h2, h3, .logo { display: block; flex-shrink: 0; }
 .filtro.ativo { background: var(--vinho); border-color: var(--vinho); color: #fff; }
 
 /* ---------- Galeria ---------- */
+.galeria__mais {
+    margin-top: 36px;
+    text-align: center;
+}
+.galeria__mais[hidden] {
+    display: none;
+}
 .galeria {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
