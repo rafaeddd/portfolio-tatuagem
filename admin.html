@@ -20,7 +20,7 @@
             border-radius: 8px;
             padding: 36px 30px;
             width: 100%;
-            max-width: 480px;
+            max-width: 600px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
         .admin-topo {
@@ -124,7 +124,11 @@
             border: 1px solid var(--borda);
             color: var(--texto);
         }
-        .btn-sair {
+        .btn-acao-topo {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-sair, .btn-voltar-site {
             background: none;
             border: 1px solid var(--borda);
             color: var(--texto-suave);
@@ -132,8 +136,9 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.85rem;
+            text-decoration: none;
         }
-        .btn-sair:hover {
+        .btn-sair:hover, .btn-voltar-site:hover {
             border-color: var(--vinho);
             color: #fff;
         }
@@ -145,6 +150,70 @@
         }
         .checkbox-linha input {
             width: auto !important;
+        }
+        .abas {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--borda);
+            padding-bottom: 10px;
+        }
+        .aba-btn {
+            background: none;
+            border: none;
+            color: var(--texto-suave);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .aba-btn.ativo {
+            background: var(--vinho);
+            color: #fff;
+        }
+        .lista-gerenciar {
+            display: grid;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .item-gerenciar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--fundo);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--borda);
+        }
+        .item-gerenciar img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .item-gerenciar input {
+            flex: 1;
+            padding: 8px;
+            background: var(--card);
+            border: 1px solid var(--borda);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .btn-apagar {
+            background: var(--vinho);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-apagar:hover {
+            background: #a30000;
         }
     </style>
 </head>
@@ -167,71 +236,82 @@
         </form>
     </div>
 
-    <!-- PAINEL DE UPLOAD -->
+    <!-- PAINEL DE ADMINISTRAÇÃO -->
     <div class="admin-card" id="tela-painel" style="display: none;">
         <div class="admin-topo">
-            <h2>Novo Trabalho</h2>
-            <button type="button" class="btn-sair" id="btn-sair">Sair</button>
+            <h2>Painel Admin</h2>
+            <div class="btn-acao-topo">
+                <a href="index.html" class="btn-voltar-site">Ver Site</a>
+                <button type="button" class="btn-sair" id="btn-sair">Sair</button>
+            </div>
         </div>
 
-        <div class="tinypng-box">
-            <p><strong>1º Passo (Opcional):</strong> Comprima sua foto para o site carregar mais rápido:</p>
-            <a href="https://tinypng.com/" target="_blank" rel="noopener" class="btn-tiny">
-                Abrir TinyPNG para otimizar imagem ↗
-            </a>
+        <div class="abas">
+            <button type="button" class="aba-btn ativo" id="tab-novo" onclick="trocarAba('novo')">Novo Trabalho</button>
+            <button type="button" class="aba-btn" id="tab-gerenciar" onclick="trocarAba('gerenciar')">Gerenciar Fotos</button>
         </div>
 
-        <form class="admin-form" id="form-upload">
-            <div id="msg-upload" class="status-msg"></div>
+        <!-- ABA 1: NOVO TRABALHO -->
+        <div id="conteudo-novo">
+            <div class="tinypng-box">
+                <p><strong>1º Passo (Opcional):</strong> Comprima sua foto para o site carregar mais rápido:</p>
+                <a href="https://tinypng.com/" target="_blank" rel="noopener" class="btn-tiny">
+                    Abrir TinyPNG para otimizar imagem ↗
+                </a>
+            </div>
 
-            <!-- Campo do Token (Ficará salvo sozinho após a primeira vez que você digitar) -->
-            <label id="box-token">Token do GitHub (Cole apenas na 1ª vez)
-                <input type="password" id="github-token" placeholder="ghp_..." required>
-            </label>
+            <form class="admin-form" id="form-upload">
+                <div id="msg-upload" class="status-msg"></div>
 
-            <label>2º Passo: Selecione a imagem do trabalho
-                <input type="file" id="arquivo-imagem" accept="image/*" required>
-            </label>
+                <label>2º Passo: Selecione a imagem do trabalho
+                    <input type="file" id="arquivo-imagem" accept="image/*" required>
+                </label>
 
-            <img id="preview" class="preview-img" alt="Pré-visualização">
+                <img id="preview" class="preview-img" alt="Pré-visualização">
 
-            <label class="checkbox-linha">
-                <input type="checkbox" id="otimizar-auto" checked>
-                <span>Otimizar tamanho automaticamente antes de enviar</span>
-            </label>
+                <label class="checkbox-linha">
+                    <input type="checkbox" id="otimizar-auto" checked>
+                    <span>Otimizar tamanho automaticamente antes de enviar</span>
+                </label>
 
-            <button type="submit" class="btn btn--cta" id="btn-enviar" style="width: 100%;">
-                Postar no Site
-            </button>
-        </form>
+                <button type="submit" class="btn btn--cta" id="btn-enviar" style="width: 100%;">
+                    Postar no Site
+                </button>
+            </form>
+        </div>
+
+        <!-- ABA 2: GERENCIAR FOTOS -->
+        <div id="conteudo-gerenciar" style="display: none;">
+            <div id="msg-gerenciar" class="status-msg"></div>
+            <p style="font-size: 0.9rem; color: var(--texto-suave); margin-bottom: 12px;">Aqui você pode apagar fotos do portfólio:</p>
+            <div class="lista-gerenciar" id="lista-gerenciar">
+                <p style="text-align: center; color: var(--texto-suave);">Carregando imagens...</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        /* =========================================================
-           CONFIGURAÇÕES DO SEU REPOSITÓRIO E LOGIN
-           ========================================================= */
         const LOGIN_ADMIN = {
-            usuario: "admin",                  // Seu usuário de acesso ao painel
-            senha: "123456"                    // Sua senha de acesso ao painel
+            usuario: "cursi",
+            senha: "1010@"
         };
 
         const DADOS_GITHUB = {
-            usuario: "SEU_USUARIO_GITHUB",     // <-- Substitua pelo seu usuário exato do GitHub
-            repositorio: "NOME_DO_REPOSITORIO",// <-- Substitua pelo nome exato do repositório
-            branch: "main",                    // Geralmente "main" ou "master"
-            pasta: "portifolio"                // Pasta onde as fotos ficam salvas
+            usuario: "rafaeddd",
+            repositorio: "portfolio-tatuagem",
+            branch: "main",
+            pasta: "portifolio",
+            token: "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"
         };
 
-        /* =========================================================
-           LÓGICA DO PAINEL
-           ========================================================= */
         const telaLogin = document.getElementById("tela-login");
         const telaPainel = document.getElementById("tela-painel");
         const msgLogin = document.getElementById("msg-login");
         const msgUpload = document.getElementById("msg-upload");
-        const inputToken = document.getElementById("github-token");
+        const msgGerenciar = document.getElementById("msg-gerenciar");
         const inputArquivo = document.getElementById("arquivo-imagem");
         const previewImg = document.getElementById("preview");
+        const listaGerenciarDiv = document.getElementById("lista-gerenciar");
 
         if (sessionStorage.getItem("cursi_admin_logado") === "true") {
             mostrarPainel();
@@ -240,9 +320,15 @@
         function mostrarPainel() {
             telaLogin.style.display = "none";
             telaPainel.style.display = "block";
-            const tokenSalvo = localStorage.getItem("cursi_gh_token");
-            if (tokenSalvo) {
-                inputToken.value = tokenSalvo; // Preenche automaticamente se já salvou antes
+        }
+
+        function trocarAba(aba) {
+            document.getElementById("tab-novo").classList.toggle("ativo", aba === 'novo');
+            document.getElementById("tab-gerenciar").classList.toggle("ativo", aba === 'gerenciar');
+            document.getElementById("conteudo-novo").style.display = aba === 'novo' ? 'block' : 'none';
+            document.getElementById("conteudo-gerenciar").style.display = aba === 'gerenciar' ? 'block' : 'none';
+            if (aba === 'gerenciar') {
+                carregarListaGerenciamento();
             }
         }
 
@@ -282,11 +368,9 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     if (!otimizar) {
-                        const base64 = event.target.result.split(",")[1];
-                        resolve(base64);
+                        resolve(event.target.result.split(",")[1]);
                         return;
                     }
-
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement("canvas");
@@ -304,8 +388,7 @@
                         const ctx = canvas.getContext("2d");
                         ctx.drawImage(img, 0, 0, largura, altura);
 
-                        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
-                        resolve(dataUrl.split(",")[1]);
+                        resolve(canvas.toDataURL("image/jpeg", 0.82).split(",")[1]);
                     };
                     img.onerror = reject;
                     img.src = event.target.result;
@@ -318,45 +401,34 @@
         async function obterProximoNumero(token) {
             const url = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}?ref=${DADOS_GITHUB.branch}`;
             const resposta = await fetch(url, {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Accept": "application/vnd.github.v3+json"
-                }
+                headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github.v3+json" }
             });
 
-            if (resposta.status === 404) {
-                return 1;
-            }
+            if (resposta.status === 404) return 1;
+            if (!resposta.ok) throw new Error("Erro ao acessar o GitHub.");
 
-            if (!resposta.ok) {
-                throw new Error("Não foi possível acessar o repositório. Verifique se o Token e o nome do usuário/repositório estão corretos.");
-            }
+            const dados = await resposta.json();
+            if (!Array.isArray(dados)) return 1;
 
-            const arquivos = await resposta.json();
             let maiorNumero = 0;
-
-            arquivos.forEach(item => {
+            dados.forEach(item => {
                 const match = item.name.match(/^(\d+)\.jpeg$/i);
                 if (match) {
                     const num = parseInt(match[1], 10);
                     if (num > maiorNumero) maiorNumero = num;
                 }
             });
-
             return maiorNumero + 1;
         }
 
+        // Envio de nova foto com redirecionamento automático
         document.getElementById("form-upload").addEventListener("submit", async (e) => {
             e.preventDefault();
             const btnEnviar = document.getElementById("btn-enviar");
-            const token = inputToken.value.trim();
             const file = inputArquivo.files[0];
             const otimizar = document.getElementById("otimizar-auto").checked;
 
             if (!file) return;
-
-            // Salva o token no navegador para não precisar redigitar nas próximas vezes
-            localStorage.setItem("cursi_gh_token", token);
 
             btnEnviar.disabled = true;
             btnEnviar.textContent = "Enviando...";
@@ -364,7 +436,7 @@
             msgUpload.className = "status-msg info";
 
             try {
-                const proximoNumero = await obterProximoNumero(token);
+                const proximoNumero = await obterProximoNumero(DADOS_GITHUB.token);
                 const nomeArquivo = `${proximoNumero}.jpeg`;
                 const conteudoBase64 = await prepararImagemBase64(file, otimizar);
 
@@ -373,36 +445,118 @@
                 const respostaUpload = await fetch(urlUpload, {
                     method: "PUT",
                     headers: {
-                        "Authorization": `Bearer ${token}`,
+                        "Authorization": `Bearer ${DADOS_GITHUB.token}`,
                         "Accept": "application/vnd.github.v3+json",
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        message: `Adiciona ${nomeArquivo} ao portfólio via painel admin`,
+                        message: `Adiciona ${nomeArquivo} ao portfólio via painel`,
                         content: conteudoBase64,
                         branch: DADOS_GITHUB.branch
                     })
                 });
 
-                if (!respostaUpload.ok) {
-                    const erroData = await respostaUpload.json();
-                    throw new Error(erroData.message || "Erro ao enviar imagem para o GitHub.");
-                }
+                if (!respostaUpload.ok) throw new Error("Erro ao enviar imagem.");
 
-                msgUpload.innerHTML = `<strong>Sucesso!</strong> A foto foi salva como <strong>${nomeArquivo}</strong>.<br>O site atualizará automaticamente em instantes.`;
+                msgUpload.innerHTML = `<strong>Sucesso!</strong> Foto ${nomeArquivo} postada. Redirecionando para o site...`;
                 msgUpload.className = "status-msg sucesso";
 
-                inputArquivo.value = "";
-                previewImg.style.display = "none";
+                // Redireciona para o index.html após 2 segundos
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 2000);
 
             } catch (erro) {
                 msgUpload.textContent = `Erro: ${erro.message}`;
                 msgUpload.className = "status-msg erro";
-            } finally {
                 btnEnviar.disabled = false;
                 btnEnviar.textContent = "Postar no Site";
             }
         });
+
+        // Carregar lista de imagens para gerenciar/apagar
+        async function carregarListaGerenciamento() {
+            listaGerenciarDiv.innerHTML = `<p style="text-align: center; color: var(--texto-suave);">Carregando fotos...</p>`;
+            try {
+                const url = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}?ref=${DADOS_GITHUB.branch}`;
+                const resposta = await fetch(url, {
+                    headers: { "Authorization": `Bearer ${DADOS_GITHUB.token}`, "Accept": "application/vnd.github.v3+json" }
+                });
+
+                if (!resposta.ok) throw new Error("Não foi possível carregar as fotos.");
+                const arquivos = await resposta.json();
+
+                const fotos = arquivos.filter(item => item.name.match(/\.(jpeg|jpg|png)$/i));
+                
+                if (fotos.length === 0) {
+                    listaGerenciarDiv.innerHTML = `<p style="text-align: center; color: var(--texto-suave);">Nenhuma foto encontrada na pasta.</p>`;
+                    return;
+                }
+
+                listaGerenciarDiv.innerHTML = "";
+                fotos.forEach(foto => {
+                    const item = document.createElement("div");
+                    item.className = "item-gerenciar";
+
+                    const img = document.createElement("img");
+                    img.src = foto.download_url;
+
+                    const nomeSpan = document.createElement("span");
+                    nomeSpan.style.flex = "1";
+                    nomeSpan.style.fontWeight = "600";
+                    nomeSpan.textContent = foto.name;
+
+                    const btnApagar = document.createElement("button");
+                    btnApagar.type = "button";
+                    btnApagar.className = "btn-apagar";
+                    btnApagar.textContent = "Apagar";
+                    btnApagar.onclick = () => apagarFoto(foto.name, foto.sha);
+
+                    item.append(img, nomeSpan, btnApagar);
+                    listaGerenciarDiv.appendChild(item);
+                });
+
+            } catch (erro) {
+                msgGerenciar.textContent = erro.message;
+                msgGerenciar.className = "status-msg erro";
+            }
+        }
+
+        // Função para deletar a foto do GitHub
+        async function apagarFoto(nomeArquivo, shaArquivo) {
+            if (!confirm(`Tem certeza que deseja apagar a foto ${nomeArquivo} do site?`)) return;
+
+            msgGerenciar.textContent = `Apagando ${nomeArquivo}...`;
+            msgGerenciar.className = "status-msg info";
+
+            try {
+                const urlDelete = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}/${nomeArquivo}`;
+                
+                const resposta = await fetch(urlDelete, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${DADOS_GITHUB.token}`,
+                        "Accept": "application/vnd.github.v3+json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: `Remove ${nomeArquivo} via painel admin`,
+                        sha: shaArquivo,
+                        branch: DADOS_GITHUB.branch
+                    })
+                });
+
+                if (!resposta.ok) throw new Error("Erro ao apagar arquivo.");
+
+                msgGerenciar.textContent = `Foto ${nomeArquivo} apagada com sucesso!`;
+                msgGerenciar.className = "status-msg sucesso";
+                carregarListaGerenciamento(); // Atualiza a lista
+
+            } catch (erro) {
+                msgGerenciar.textContent = `Erro ao apagar: ${erro.message}`;
+                msgGerenciar.className = "status-msg erro";
+            }
+        }
     </script>
 </body>
 </html>
