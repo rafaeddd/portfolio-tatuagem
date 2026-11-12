@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portfólio | Cursi Tattoo</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: var(--fundo);
+        }
+        .admin-card {
+            background: var(--card);
+            border-top: 4px solid var(--vinho);
+            border-radius: 8px;
+            padding: 36px 30px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .admin-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .admin-card h2 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin: 0;
+        }
+        .admin-form {
+            display: grid;
+            gap: 16px;
+        }
+        .admin-form label {
+            display: grid;
+            gap: 6px;
+            font-size: 0.95rem;
+            color: var(--texto-suave);
+        }
+        .admin-form input[type="text"],
+        .admin-form input[type="password"],
+        .admin-form input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background: var(--fundo);
+            border: 2px solid var(--borda);
+            border-radius: 4px;
+            color: #fff;
+            font-family: inherit;
+        }
+        .admin-form input:focus {
+            outline: none;
+            border-color: var(--laranja);
+        }
+        .tinypng-box {
+            background: rgba(197, 91, 17, 0.12);
+            border: 1px solid var(--laranja);
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .tinypng-box p {
+            font-size: 0.9rem;
+            color: var(--texto);
+            margin: 0;
+        }
+        .btn-tiny {
+            display: inline-block;
+            text-align: center;
+            background: #2e2e2e;
+            color: var(--laranja-claro);
+            border: 1px solid var(--laranja);
+            padding: 8px 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-tiny:hover {
+            background: var(--laranja);
+            color: #fff;
+        }
+        .preview-img {
+            max-height: 220px;
+            width: auto;
+            margin: 0 auto;
+            border-radius: 4px;
+            border: 2px solid var(--borda);
+            display: none;
+        }
+        .status-msg {
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+        .status-msg.erro {
+            display: block;
+            background: rgba(130, 0, 0, 0.35);
+            border: 1px solid var(--vinho);
+            color: #ff9999;
+        }
+        .status-msg.sucesso {
+            display: block;
+            background: rgba(0, 200, 83, 0.15);
+            border: 1px solid #00c853;
+            color: #69f0ae;
+        }
+        .status-msg.info {
+            display: block;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--borda);
+            color: var(--texto);
+        }
+        .btn-sair {
+            background: none;
+            border: 1px solid var(--borda);
+            color: var(--texto-suave);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .btn-sair:hover {
+            border-color: var(--vinho);
+            color: #fff;
+        }
+        .checkbox-linha {
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .checkbox-linha input {
+            width: auto !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE LOGIN -->
+    <div class="admin-card" id="tela-login">
+        <div class="admin-topo">
+            <h2>Acesso Restrito</h2>
+        </div>
+        <form class="admin-form" id="form-login">
+            <div id="msg-login" class="status-msg"></div>
+            <label>Usuário
+                <input type="text" id="login-usuario" required autocomplete="username">
+            </label>
+            <label>Senha
+                <input type="password" id="login-senha" required autocomplete="current-password">
+            </label>
+            <button type="submit" class="btn btn--cta" style="width: 100%;">Entrar no Painel</button>
+        </form>
+    </div>
+
+    <!-- PAINEL DE UPLOAD -->
+    <div class="admin-card" id="tela-painel" style="display: none;">
+        <div class="admin-topo">
+            <h2>Novo Trabalho</h2>
+            <button type="button" class="btn-sair" id="btn-sair">Sair</button>
+        </div>
+
+        <div class="tinypng-box">
+            <p><strong>1º Passo (Opcional):</strong> Comprima sua foto para o site carregar mais rápido:</p>
+            <a href="https://tinypng.com/" target="_blank" rel="noopener" class="btn-tiny">
+                Abrir TinyPNG para otimizar imagem ↗
+            </a>
+        </div>
+
+        <form class="admin-form" id="form-upload">
+            <div id="msg-upload" class="status-msg"></div>
+
+            <!-- Campo do Token (Ficará salvo sozinho após a primeira vez que você digitar) -->
+            <label id="box-token">Token do GitHub (Cole apenas na 1ª vez)
+                <input type="password" id="github-token" placeholder="ghp_..." required>
+            </label>
+
+            <label>2º Passo: Selecione a imagem do trabalho
+                <input type="file" id="arquivo-imagem" accept="image/*" required>
+            </label>
+
+            <img id="preview" class="preview-img" alt="Pré-visualização">
+
+            <label class="checkbox-linha">
+                <input type="checkbox" id="otimizar-auto" checked>
+                <span>Otimizar tamanho automaticamente antes de enviar</span>
+            </label>
+
+            <button type="submit" class="btn btn--cta" id="btn-enviar" style="width: 100%;">
+                Postar no Site
+            </button>
+        </form>
+    </div>
+
+    <script>
+        /* =========================================================
+           CONFIGURAÇÕES DO SEU REPOSITÓRIO E LOGIN
+           ========================================================= */
+        const LOGIN_ADMIN = {
+            usuario: "admin",                  // Seu usuário de acesso ao painel
+            senha: "123456"                    // Sua senha de acesso ao painel
+        };
+
+        const DADOS_GITHUB = {
+            usuario: "SEU_USUARIO_GITHUB",     // <-- Substitua pelo seu usuário exato do GitHub
+            repositorio: "NOME_DO_REPOSITORIO",// <-- Substitua pelo nome exato do repositório
+            branch: "main",                    // Geralmente "main" ou "master"
+            pasta: "portifolio"                // Pasta onde as fotos ficam salvas
+        };
+
+        /* =========================================================
+           LÓGICA DO PAINEL
+           ========================================================= */
+        const telaLogin = document.getElementById("tela-login");
+        const telaPainel = document.getElementById("tela-painel");
+        const msgLogin = document.getElementById("msg-login");
+        const msgUpload = document.getElementById("msg-upload");
+        const inputToken = document.getElementById("github-token");
+        const inputArquivo = document.getElementById("arquivo-imagem");
+        const previewImg = document.getElementById("preview");
+
+        if (sessionStorage.getItem("cursi_admin_logado") === "true") {
+            mostrarPainel();
+        }
+
+        function mostrarPainel() {
+            telaLogin.style.display = "none";
+            telaPainel.style.display = "block";
+            const tokenSalvo = localStorage.getItem("cursi_gh_token");
+            if (tokenSalvo) {
+                inputToken.value = tokenSalvo; // Preenche automaticamente se já salvou antes
+            }
+        }
+
+        document.getElementById("form-login").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const user = document.getElementById("login-usuario").value.trim();
+            const pass = document.getElementById("login-senha").value;
+
+            if (user === LOGIN_ADMIN.usuario && pass === LOGIN_ADMIN.senha) {
+                sessionStorage.setItem("cursi_admin_logado", "true");
+                msgLogin.className = "status-msg";
+                mostrarPainel();
+            } else {
+                msgLogin.textContent = "Usuário ou senha incorretos.";
+                msgLogin.className = "status-msg erro";
+            }
+        });
+
+        document.getElementById("btn-sair").addEventListener("click", () => {
+            sessionStorage.removeItem("cursi_admin_logado");
+            telaPainel.style.display = "none";
+            telaLogin.style.display = "block";
+        });
+
+        inputArquivo.addEventListener("change", () => {
+            const file = inputArquivo.files[0];
+            if (file) {
+                previewImg.src = URL.createObjectURL(file);
+                previewImg.style.display = "block";
+            } else {
+                previewImg.style.display = "none";
+            }
+        });
+
+        function prepararImagemBase64(file, otimizar) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (!otimizar) {
+                        const base64 = event.target.result.split(",")[1];
+                        resolve(base64);
+                        return;
+                    }
+
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement("canvas");
+                        const MAX_LARGURA = 1200;
+                        let largura = img.width;
+                        let altura = img.height;
+
+                        if (largura > MAX_LARGURA) {
+                            altura = Math.round((altura * MAX_LARGURA) / largura);
+                            largura = MAX_LARGURA;
+                        }
+
+                        canvas.width = largura;
+                        canvas.height = altura;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, largura, altura);
+
+                        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+                        resolve(dataUrl.split(",")[1]);
+                    };
+                    img.onerror = reject;
+                    img.src = event.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function obterProximoNumero(token) {
+            const url = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}?ref=${DADOS_GITHUB.branch}`;
+            const resposta = await fetch(url, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+
+            if (resposta.status === 404) {
+                return 1;
+            }
+
+            if (!resposta.ok) {
+                throw new Error("Não foi possível acessar o repositório. Verifique se o Token e o nome do usuário/repositório estão corretos.");
+            }
+
+            const arquivos = await resposta.json();
+            let maiorNumero = 0;
+
+            arquivos.forEach(item => {
+                const match = item.name.match(/^(\d+)\.jpeg$/i);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (num > maiorNumero) maiorNumero = num;
+                }
+            });
+
+            return maiorNumero + 1;
+        }
+
+        document.getElementById("form-upload").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btnEnviar = document.getElementById("btn-enviar");
+            const token = inputToken.value.trim();
+            const file = inputArquivo.files[0];
+            const otimizar = document.getElementById("otimizar-auto").checked;
+
+            if (!file) return;
+
+            // Salva o token no navegador para não precisar redigitar nas próximas vezes
+            localStorage.setItem("cursi_gh_token", token);
+
+            btnEnviar.disabled = true;
+            btnEnviar.textContent = "Enviando...";
+            msgUpload.textContent = "Calculando próximo número e enviando para o GitHub...";
+            msgUpload.className = "status-msg info";
+
+            try {
+                const proximoNumero = await obterProximoNumero(token);
+                const nomeArquivo = `${proximoNumero}.jpeg`;
+                const conteudoBase64 = await prepararImagemBase64(file, otimizar);
+
+                const urlUpload = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}/${nomeArquivo}`;
+
+                const respostaUpload = await fetch(urlUpload, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Accept": "application/vnd.github.v3+json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: `Adiciona ${nomeArquivo} ao portfólio via painel admin`,
+                        content: conteudoBase64,
+                        branch: DADOS_GITHUB.branch
+                    })
+                });
+
+                if (!respostaUpload.ok) {
+                    const erroData = await respostaUpload.json();
+                    throw new Error(erroData.message || "Erro ao enviar imagem para o GitHub.");
+                }
+
+                msgUpload.innerHTML = `<strong>Sucesso!</strong> A foto foi salva como <strong>${nomeArquivo}</strong>.<br>O site atualizará automaticamente em instantes.`;
+                msgUpload.className = "status-msg sucesso";
+
+                inputArquivo.value = "";
+                previewImg.style.display = "none";
+
+            } catch (erro) {
+                msgUpload.textContent = `Erro: ${erro.message}`;
+                msgUpload.className = "status-msg erro";
+            } finally {
+                btnEnviar.disabled = false;
+                btnEnviar.textContent = "Postar no Site";
+            }
+        });
+    </script>
+</body>
+</html>
