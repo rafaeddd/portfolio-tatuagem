@@ -470,3 +470,55 @@ h1, h2, h3, .logo { display: block; flex-shrink: 0; }
     .slide.ativo::before { animation: none; }
     *, *::before, *::after { transition-duration: .01ms !important; }
 }
+
+/* Rolagem suave para toda a página (faz o link do rodapé funcionar suavemente) */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Estilo e posição do botão flutuante */
+#btn-topo {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999; /* Garante que fique por cima de todas as imagens e textos */
+    background-color: #820000; /* Mesma cor do tema do seu site */
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    cursor: pointer;
+    display: none; /* Começa escondido até a pessoa rolar a página */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+#btn-topo:hover {
+    background-color: #a30000;
+    transform: scale(1.1);
+}
+
+.rodape__linha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+}
+/* Centraliza os links do menu mantendo a logo na esquerda */
+.topo__barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1; /* Faz o menu ocupar o espaço restante e centralizar */
+    gap: 20px;
+}

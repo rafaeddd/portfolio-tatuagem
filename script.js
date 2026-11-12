@@ -170,3 +170,25 @@ const topo = document.getElementById("topo");
 function atualizarTopo() { topo.classList.toggle("rolou", window.scrollY > 40); }
 window.addEventListener("scroll", atualizarTopo, { passive: true });
 atualizarTopo();
+
+// ---------- Botão Voltar ao Topo ----------
+const btnTopo = document.getElementById("btn-topo");
+
+if (btnTopo) {
+    // Mostra o botão após rolar 300px para baixo
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 300) {
+            btnTopo.style.display = "block";
+        } else {
+            btnTopo.style.display = "none";
+        }
+    });
+
+    // Rola suavemente até o topo ao clicar
+    btnTopo.addEventListener("click", () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+}
