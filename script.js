@@ -2,10 +2,10 @@
    CONFIGURAÇÕES: edite só esta parte
    ========================================================= */
 const CONFIG = {
-    nome: "Nome do Tatuador(a)",
-    whatsapp: "5567999999999",          // DDI + DDD + número, só números
-    instagram: "SEU_USUARIO",           // sem o @
-    endereco: "Seu endereço aqui, Cidade - UF"
+    nome: "Cursi Tattoo",
+    whatsapp: "5567992175023",          // DDI + DDD + número, só números
+    instagram: "cursi_gaby_tattoo",           // sem o @
+    endereco: "Endereço: R. DA 2, 1660 - Deoclécio Artuzzi, Dourados - MS, 79839-408"
 };
 
 // Fotos ficam na pasta "imagens/". "estilo" é usado nos filtros.
