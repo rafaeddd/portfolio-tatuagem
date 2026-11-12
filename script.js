@@ -90,7 +90,7 @@ function desenharGaleria(estilo) {
     if (estilo === "Todos") {
         for (let i = 1; i <= CONFIG.totalFotosAutomaticas; i++) {
             criarCardFoto({
-                arquivo: `${i}.jpg`,
+                arquivo: `${i}.jpeg`,
                 descricao: `Trabalho #${i}`,
                 estilo: "Cursi Tattoo",
                 pasta: CONFIG.pastaPortifolio
