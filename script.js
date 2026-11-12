@@ -11,9 +11,9 @@ const CONFIG = {
 
 // Fotos em destaque (ajustadas para a pasta portifolio ou imagens conforme sua estrutura)
 const minhasTatuagens = [
-    { arquivo: "estilo1.jpg", descricao: "Lobo", estilo: "Realismo", pasta: "portifolio" },
-    { arquivo: "estilo2.jpg", descricao: "Floral", estilo: "Fine Line", pasta: "portifolio" },
-    { arquivo: "estilo3.jpg", descricao: "Geométrico", estilo: "Blackwork", pasta: "portifolio" }
+    { arquivo: "estilo1.jpeg", descricao: "Lobo", estilo: "Realismo", pasta: "portifolio" },
+    { arquivo: "estilo2.jpeg", descricao: "Floral", estilo: "Fine Line", pasta: "portifolio" },
+    { arquivo: "estilo3.jpeg", descricao: "Geométrico", estilo: "Blackwork", pasta: "portifolio" }
 ];
 
 /* =========================================================
