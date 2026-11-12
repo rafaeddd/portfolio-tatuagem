@@ -105,6 +105,7 @@
             font-size: 0.9rem;
             text-align: center;
             display: none;
+            margin-bottom: 16px;
         }
         .status-msg.erro {
             display: block;
@@ -137,6 +138,8 @@
             cursor: pointer;
             font-size: 0.85rem;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
         .btn-sair:hover, .btn-voltar-site:hover {
             border-color: var(--vinho);
@@ -193,15 +196,13 @@
             height: 50px;
             object-fit: cover;
             border-radius: 4px;
+            background: #000;
         }
-        .item-gerenciar input {
+        .item-gerenciar span {
             flex: 1;
-            padding: 8px;
-            background: var(--card);
-            border: 1px solid var(--borda);
+            font-weight: 600;
             color: #fff;
-            border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         .btn-apagar {
             background: var(--vinho);
@@ -223,6 +224,7 @@
     <div class="admin-card" id="tela-login">
         <div class="admin-topo">
             <h2>Acesso Restrito</h2>
+            <a href="./index.html" class="btn-voltar-site">Ver Site</a>
         </div>
         <form class="admin-form" id="form-login">
             <div id="msg-login" class="status-msg"></div>
@@ -241,7 +243,7 @@
         <div class="admin-topo">
             <h2>Painel Admin</h2>
             <div class="btn-acao-topo">
-                <a href="index.html" class="btn-voltar-site">Ver Site</a>
+                <a href="./index.html" class="btn-voltar-site">Ver Site</a>
                 <button type="button" class="btn-sair" id="btn-sair">Sair</button>
             </div>
         </div>
@@ -285,7 +287,7 @@
             <div id="msg-gerenciar" class="status-msg"></div>
             <p style="font-size: 0.9rem; color: var(--texto-suave); margin-bottom: 12px;">Aqui você pode apagar fotos do portfólio:</p>
             <div class="lista-gerenciar" id="lista-gerenciar">
-                <p style="text-align: center; color: var(--texto-suave);">Carregando imagens...</p>
+                <p style="text-align: center; color: var(--texto-suave);">Carregando fotos...</p>
             </div>
         </div>
     </div>
@@ -301,7 +303,7 @@
             repositorio: "portfolio-tatuagem",
             branch: "main",
             pasta: "portifolio",
-            token: "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"
+            token: "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"
         };
 
         const telaLogin = document.getElementById("tela-login");
@@ -421,7 +423,6 @@
             return maiorNumero + 1;
         }
 
-        // Envio de nova foto com redirecionamento automático
         document.getElementById("form-upload").addEventListener("submit", async (e) => {
             e.preventDefault();
             const btnEnviar = document.getElementById("btn-enviar");
@@ -461,7 +462,6 @@
                 msgUpload.innerHTML = `<strong>Sucesso!</strong> Foto ${nomeArquivo} postada. Redirecionando para o site...`;
                 msgUpload.className = "status-msg sucesso";
 
-                // Redireciona para o index.html após 2 segundos
                 setTimeout(() => {
                     window.location.href = "index.html";
                 }, 2000);
@@ -474,8 +474,8 @@
             }
         });
 
-        // Carregar lista de imagens para gerenciar/apagar
         async function carregarListaGerenciamento() {
+            msgGerenciar.style.display = "none";
             listaGerenciarDiv.innerHTML = `<p style="text-align: center; color: var(--texto-suave);">Carregando fotos...</p>`;
             try {
                 const url = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}?ref=${DADOS_GITHUB.branch}`;
@@ -483,10 +483,18 @@
                     headers: { "Authorization": `Bearer ${DADOS_GITHUB.token}`, "Accept": "application/vnd.github.v3+json" }
                 });
 
-                if (!resposta.ok) throw new Error("Não foi possível carregar as fotos.");
-                const arquivos = await resposta.json();
+                if (resposta.status === 404) {
+                    listaGerenciarDiv.innerHTML = `<p style="text-align: center; color: var(--texto-suave);">A pasta 'portifolio' está vazia.</p>`;
+                    return;
+                }
 
-                const fotos = arquivos.filter(item => item.name.match(/\.(jpeg|jpg|png)$/i));
+                if (!resposta.ok) {
+                    const erroJson = await resposta.json().catch(() => ({}));
+                    throw new Error(erroJson.message || `Erro HTTP ${resposta.status}`);
+                }
+
+                const arquivos = await resposta.json();
+                const fotos = arquivos.filter(item => item.name.match(/\.(jpeg|jpg|png|webp)$/i));
                 
                 if (fotos.length === 0) {
                     listaGerenciarDiv.innerHTML = `<p style="text-align: center; color: var(--texto-suave);">Nenhuma foto encontrada na pasta.</p>`;
@@ -499,11 +507,10 @@
                     item.className = "item-gerenciar";
 
                     const img = document.createElement("img");
-                    img.src = foto.download_url;
+                    img.src = `https://raw.githubusercontent.com/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/${DADOS_GITHUB.branch}/${DADOS_GITHUB.pasta}/${foto.name}`;
+                    img.alt = foto.name;
 
                     const nomeSpan = document.createElement("span");
-                    nomeSpan.style.flex = "1";
-                    nomeSpan.style.fontWeight = "600";
                     nomeSpan.textContent = foto.name;
 
                     const btnApagar = document.createElement("button");
@@ -517,17 +524,19 @@
                 });
 
             } catch (erro) {
-                msgGerenciar.textContent = erro.message;
+                listaGerenciarDiv.innerHTML = "";
+                msgGerenciar.textContent = `Falha ao carregar do GitHub: ${erro.message}`;
                 msgGerenciar.className = "status-msg erro";
+                msgGerenciar.style.display = "block";
             }
         }
 
-        // Função para deletar a foto do GitHub
         async function apagarFoto(nomeArquivo, shaArquivo) {
             if (!confirm(`Tem certeza que deseja apagar a foto ${nomeArquivo} do site?`)) return;
 
             msgGerenciar.textContent = `Apagando ${nomeArquivo}...`;
             msgGerenciar.className = "status-msg info";
+            msgGerenciar.style.display = "block";
 
             try {
                 const urlDelete = `https://api.github.com/repos/${DADOS_GITHUB.usuario}/${DADOS_GITHUB.repositorio}/contents/${DADOS_GITHUB.pasta}/${nomeArquivo}`;
@@ -546,11 +555,11 @@
                     })
                 });
 
-                if (!resposta.ok) throw new Error("Erro ao apagar arquivo.");
+                if (!resposta.ok) throw new Error("Erro ao apagar arquivo no GitHub.");
 
                 msgGerenciar.textContent = `Foto ${nomeArquivo} apagada com sucesso!`;
                 msgGerenciar.className = "status-msg sucesso";
-                carregarListaGerenciamento(); // Atualiza a lista
+                carregarListaGerenciamento();
 
             } catch (erro) {
                 msgGerenciar.textContent = `Erro ao apagar: ${erro.message}`;
