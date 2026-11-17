@@ -9,11 +9,11 @@ const CONFIG = {
     pastaPortifolio: "portifolio"       // Nome da pasta onde ficam as fotos numeradas
 };
 
-// Fotos em destaque (ajustadas para a pasta imagens ou imagens conforme sua estrutura)
+// Fotos em destaque fixas (caso queira manter no portfólio inicial)
 const minhasTatuagens = [
-    { arquivo: "estilo1.jpeg", descricao: "Animal", estilo: "Fine Line", pasta: "imagens" },
-    { arquivo: "estilo2.jpeg", descricao: "Floral", estilo: "Fine Line", pasta: "imagens" },
-    { arquivo: "estilo3.jpeg", descricao: "Geométrico", estilo: "Blackwork", pasta: "imagens" }
+    { arquivo: "estilo1.jpeg", descricao: "Animal", estilo: "Cursi Tattoo", pasta: "imagens" },
+    { arquivo: "estilo2.jpeg", descricao: "Floral", estilo: "Cursi Tattoo", pasta: "imagens" },
+    { arquivo: "estilo3.jpeg", descricao: "Geométrico", estilo: "Cursi Tattoo", pasta: "imagens" }
 ];
 
 /* =========================================================
@@ -39,15 +39,13 @@ if (whatsappFlutuante) {
         `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Olá! Vi seu portfólio e gostaria de um orçamento.")}`;
 }
 
-// ---------- Galeria Automática + Filtros + Paginação de 4 em 4 ----------
+// ---------- Galeria Automática + Paginação de 4 em 4 ----------
 const galeriaDiv = document.getElementById("galeria");
 const filtrosDiv = document.getElementById("filtros");
 const btnVerMais = document.getElementById("btn-ver-mais");
 const containerVerMais = btnVerMais ? btnVerMais.parentElement : null;
 
-const estilos = ["Todos", "Fine Line", "Caligrafia", "Delicada", "Realismo", "Blackwork", "Cover Up"];
 const FOTOS_POR_VEZ = 4;
-
 let listaAtual = [];
 let quantidadeExibida = 0;
 
@@ -55,21 +53,19 @@ function criarCardFoto(tatoo) {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "foto-card";
-    card.setAttribute("aria-label", `Ampliar: ${tatoo.descricao} (${tatoo.estilo})`);
+    card.setAttribute("aria-label", `Ampliar: ${tatoo.descricao}`);
 
     const caminho = `${tatoo.pasta || "imagens"}/${tatoo.arquivo}`;
 
     const img = document.createElement("img");
     img.src = caminho;
-    img.alt = `${tatoo.descricao}, estilo ${tatoo.estilo}`;
+    img.alt = tatoo.descricao;
     img.loading = "lazy";
+    img.draggable = false; // Proteção contra arrastar imagem
 
     const legenda = document.createElement("span");
     legenda.className = "foto-card__legenda";
     legenda.textContent = tatoo.descricao;
-    const estiloTxt = document.createElement("small");
-    estiloTxt.textContent = tatoo.estilo;
-    legenda.appendChild(estiloTxt);
 
     card.append(img, legenda);
     card.addEventListener("click", () => abrirLightbox(tatoo));
@@ -96,47 +92,43 @@ function mostrarProximoLote() {
     }
 }
 
-async function desenharGaleria(estilo) {
+async function desenharGaleria() {
     if (!galeriaDiv) return;
-    galeriaDiv.innerHTML = "";
+    galeriaDiv.innerHTML = `<p class="galeria__vazia" style="grid-column: 1/-1; text-align: center;">Carregando trabalhos...</p>`;
     quantidadeExibida = 0;
     if (containerVerMais) containerVerMais.hidden = true;
 
-    let candidatas = estilo === "Todos"
-        ? [...minhasTatuagens]
-        : minhasTatuagens.filter(t => t.estilo === estilo);
+    let candidatas = [...minhasTatuagens];
 
-    // Se estiver na aba "Todos", busca sequencialmente a partir do 1.jpeg
-    // Assim que achar um número que não existe, ele para o loop na mesma hora (sem gerar erros no console)
-    if (estilo === "Todos") {
-        let i = 1;
-        let sequenciaAtiva = true;
+    // Varredura sequencial a partir do 1.jpeg na pasta de portfólio
+    let i = 1;
+    let sequenciaAtiva = true;
 
-        while (sequenciaAtiva && i <= 100) {
-            const arquivoNome = `${i}.jpeg`;
-            const caminhoCompleto = `${CONFIG.pastaPortifolio}/${arquivoNome}`;
-            
-            const existe = await checarArquivo(caminhoCompleto);
-            
-            if (existe) {
-                candidatas.push({
-                    arquivo: arquivoNome,
-                    descricao: `Trabalho #${i}`,
-                    estilo: "Cursi Tattoo",
-                    pasta: CONFIG.pastaPortifolio
-                });
-                i++;
-            } else {
-                // Se a imagem i não existe, para a varredura automática
-                sequenciaAtiva = false;
-            }
+    while (sequenciaAtiva && i <= 300) {
+        const arquivoNome = `${i}.jpeg`;
+        const caminhoCompleto = `${CONFIG.pastaPortifolio}/${arquivoNome}`;
+        
+        const existe = await checarArquivo(caminhoCompleto);
+        
+        if (existe) {
+            candidatas.push({
+                arquivo: arquivoNome,
+                descricao: `Trabalho #${i}`,
+                pasta: CONFIG.pastaPortifolio
+            });
+            i++;
+        } else {
+            sequenciaAtiva = false;
         }
     }
 
-    listaAtual = candidatas;
+    // INVERTE A ORDEM: Os uploads mais recentes (números maiores) aparecem primeiro no topo
+    listaAtual = candidatas.reverse();
+
+    galeriaDiv.innerHTML = "";
 
     if (listaAtual.length === 0) {
-        galeriaDiv.innerHTML = `<p class="galeria__vazia">Nenhum trabalho encontrado nessa categoria.</p>`;
+        galeriaDiv.innerHTML = `<p class="galeria__vazia" style="grid-column: 1/-1; text-align: center;">Nenhum trabalho encontrado.</p>`;
         return;
     }
 
@@ -147,26 +139,17 @@ if (btnVerMais) {
     btnVerMais.addEventListener("click", mostrarProximoLote);
 }
 
+// Renderiza apenas o botão "Todos" nos filtros
 if (filtrosDiv) {
-    estilos.forEach((estilo, i) => {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "filtro" + (i === 0 ? " ativo" : "");
-        b.textContent = estilo;
-        b.addEventListener("click", () => {
-            filtrosDiv.querySelectorAll(".filtro").forEach(x => x.classList.remove("ativo"));
-            b.classList.add("ativo");
-            desenharGaleria(estilo);
-        });
-        filtrosDiv.appendChild(b);
-    });
+    filtrosDiv.innerHTML = `<button type="button" class="filtro ativo" data-filtro="todos">Todos</button>`;
 }
-desenharGaleria("Todos");
 
-// Estilos também no formulário
+desenharGaleria();
+
+// Select de estilo limpo no formulário de orçamento
 const campoEstilo = document.getElementById("campo-estilo");
 if (campoEstilo) {
-    ["Ainda não sei", ...estilos.slice(1)].forEach(e => campoEstilo.add(new Option(e, e)));
+    ["Ainda não sei", "Fine Line", "Caligrafia", "Delicada", "Realismo", "Blackwork", "Cover Up"].forEach(e => campoEstilo.add(new Option(e, e)));
 }
 
 // ---------- Lightbox ----------
@@ -178,7 +161,7 @@ function abrirLightbox(tatoo) {
     if (!lightbox || !lbImg) return;
     lbImg.src = `${tatoo.pasta || "imagens"}/${tatoo.arquivo}`;
     lbImg.alt = tatoo.descricao;
-    if (lbLegenda) lbLegenda.textContent = `${tatoo.descricao} | ${tatoo.estilo}`;
+    if (lbLegenda) lbLegenda.textContent = tatoo.descricao;
     lightbox.hidden = false;
     document.body.style.overflow = "hidden";
     const btnFechar = document.getElementById("lightbox-fechar");
